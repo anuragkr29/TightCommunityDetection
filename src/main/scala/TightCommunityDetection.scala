@@ -82,8 +82,6 @@ object TightCommunityDetection {
 
       // aggregate all the features names
       finalIndividualMap = finalIndividualMap.union(individual_map)
-      print(inputDir + featFileName)
-      System.exit(0)
     }
     // group all the neighbors of a vertex together
     val finalFeatureMap = finalIndividualMap.groupByKey.mapValues(_.flatten)
