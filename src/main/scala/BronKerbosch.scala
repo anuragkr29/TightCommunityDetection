@@ -14,23 +14,23 @@ import org.apache.spark.graphx.Graph.graphToGraphOps
 class BronKerbosch[VD: ClassTag, ED: ClassTag](sc: SparkContext, inputGraph: Graph[VD, ED]) {
 
 
-  private val sparkContext: SparkContext = sc;
+  private val sparkContext: SparkContext = sc
 
-  private val graph: Graph[VD, ED] = inputGraph;
+  private val graph: Graph[VD, ED] = inputGraph
 
   private val neighbourVerticesMap = graph.collectNeighborIds(EdgeDirection.Either)
     .collect().map(vertex => (vertex._1.asInstanceOf[Long], vertex._2.toSet))
-    .toMap;
+    .toMap
 
-  def runAlgorithm = {
+  def runAlgorithm: MutableSet[MutableSet[Long]] = {
 
     val potentialClique = MutableSet[Long]()
     val candidates = graph.vertices
-      .map(vertex => vertex._1.asInstanceOf[Long]).collect().toSet;
-    val alreadyFound = MutableSet[Long]();
+      .map(vertex => vertex._1.asInstanceOf[Long]).collect().toSet
+    val alreadyFound = MutableSet[Long]()
     val cliques = MutableSet[MutableSet[Long]]()
-    findCliques(potentialClique, candidates, alreadyFound, cliques);
-    cliques;
+    findCliques(potentialClique, candidates, alreadyFound, cliques)
+    cliques
   }
 
   private def findCliques(potentialClique: MutableSet[Long],
@@ -43,7 +43,7 @@ class BronKerbosch[VD: ClassTag, ED: ClassTag](sc: SparkContext, inputGraph: Gra
     candidates.foreach { candidateVertex =>
     {
       val neighbourVertices = neighbourVerticesMap
-        .getOrElse(candidateVertex, Set[Long]()).asInstanceOf[Set[Long]]
+        .getOrElse(candidateVertex, Set[Long]())
 
       findCliques(potentialClique ++ MutableSet(candidateVertex),
         candidates.intersect(neighbourVertices),
