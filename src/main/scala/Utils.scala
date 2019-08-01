@@ -19,23 +19,23 @@ object Utils {
       ""
     }
     else {
-      return matches.group(1).replaceAll(";", "_") + "_" + matches.group(2)
+      matches.group(1).replaceAll(";", "_") + "_" + matches.group(2)
     }
   }
 
   /**
     * Function to get the feature matrix
     * @param line - feature string containing binary values
-    * @param selfid - node id corresponding to the feature values
+    * @param selfId - node id corresponding to the feature values
     * @return - array of tuple containing nodeID and corresponding feature
     */
-  def getFeatureMatrix(line: String, selfid: Int): (Int, Array[String]) = {
-    var allents = line.split(" ")
-    if (selfid != -1) {
-      return (selfid, allents)
+  def getFeatureMatrix(line: String, selfId: Int): (Int, Array[String]) = {
+    val allents = line.split(" ")
+    if (selfId != -1) {
+      (selfId, allents)
     }
     else {
-      return (allents(0).toInt, allents.takeRight(allents.length - 1))
+      (allents(0).toInt, allents.takeRight(allents.length - 1))
     }
   }
 
@@ -62,8 +62,8 @@ object Utils {
   def getIntersection(firstArray: Array[String], secondArray: Array[String]): Int = {
     if (firstArray.length > 0 && secondArray.length > 0) {
       val intersect = firstArray.map(x => secondArray.count(y => y == x))
-      (intersect.sum)
+      intersect.sum
     } else
-      (0)
+      0
   }
 }
