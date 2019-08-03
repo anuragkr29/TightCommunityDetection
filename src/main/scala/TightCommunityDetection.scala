@@ -32,7 +32,7 @@ object TightCommunityDetection {
     val validEdgeThreshold = args(3)
 
     // boolean value whther to use minimised edges
-    val useMinimisedEdges = args(4)
+    var useMinimisedEdges = args(4)
     // configure spark and get spark context
     val sparkConfig = new SparkConf().setAppName("Tight Community Detector")
     val spark = new SparkSession.Builder()
@@ -52,8 +52,8 @@ object TightCommunityDetection {
     var totalFeatureDf: RDD[(Int, Array[String])] = sc.emptyRDD[(Int, Array[String])]
     var finalIndividualMap: RDD[(Int, Array[String])] = sc.emptyRDD[(Int, Array[String])]
 
-
     for (egoID <- egoIDs) {
+
       // get the directory name of all features to loop through
       val featnameFileName = "/%d.featnames*".format(egoID)
       val featFileName = "/%d.feat".format(egoID)
@@ -69,8 +69,9 @@ object TightCommunityDetection {
       fmap = fmap.union(features).distinct
 
       // get the feature matrix from feat file
-      val featureMatrixDF = sc.textFile(inputDir + featFileName).map(getFeatureMatrix(_, -1))
-      totalFeatureDf = totalFeatureDf.union(featureMatrixDF)
+      var featureMatrixDF = sc.textFile(inputDir + featFileName).map(getFeatureMatrix(_, -1))
+      val egoFeatMatrixDF = sc.textFile(inputDir + egoFeatFileName).map(getFeatureMatrix(_, -1))
+      featureMatrixDF = featureMatrixDF.union(egoFeatMatrixDF)
 
       // get unique features for each ego Node
       val uniqueFeatureForCurrentEgo = features.collect
@@ -140,13 +141,13 @@ object TightCommunityDetection {
     val detectedCliques = cliqueFinder.runAlgorithm
 
     // making the detected Cliques as RDD to write easily on file
-    val detectedCliquesDF = sc.parallelize(detectedCliques.map(_.toArray).toSeq).toDF
+    var detectedCliquesDF = sc.parallelize(detectedCliques.map(_.toArray).toSeq).toDF.withColumn("value", stringify($"value"))
 
     detectedCliquesDF.coalesce(1)
       .write
       .mode(SaveMode.Overwrite)
       .format("csv")
-      .option("header", "true")
+      .option("header", "false")
       .save(outputDir)
   }
 

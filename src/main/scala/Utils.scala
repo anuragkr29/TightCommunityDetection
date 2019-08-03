@@ -4,6 +4,7 @@
 
 import scala.util.matching.Regex
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.functions.udf
 
 object Utils {
   /**
@@ -66,4 +67,12 @@ object Utils {
     } else
       0
   }
+
+  /**
+    * making a user defined function to stringify array of numbers
+    */
+  val stringify = udf((vs: Seq[String]) => vs match {
+    case null => null
+    case _    => s"""[${vs.mkString(",")}]"""
+  })
 }
